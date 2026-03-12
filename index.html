@@ -68,6 +68,7 @@
             overflow: hidden;
             flex-shrink: 0;
             border: 2px solid white;
+            cursor: pointer;
         }
 
         .logo-icon img {
@@ -164,7 +165,6 @@
             color: var(--white);
         }
 
-        /* باقي التنسيقات كما هي - لم أغيرها للحفاظ على المساحة */
         .about-card {
             background: white;
             border-radius: 25px;
@@ -325,6 +325,7 @@
             text-align: center;
             cursor: pointer;
             border: 1px solid #ffeeee;
+            position: relative;
         }
 
         .icon-card:active {
@@ -402,6 +403,7 @@
             border: 2px solid var(--primary-red);
         }
 
+        /* نافذة الصور المكبرة - واحدة فقط */
         #imageModal {
             display: none;
             position: fixed;
@@ -432,6 +434,7 @@
             border-radius: 50%;
             font-size: 1.3rem;
             cursor: pointer;
+            z-index: 1001;
         }
 
         .form-section {
@@ -573,6 +576,7 @@
             text-decoration: none;
             display: inline-block;
             font-weight: 600;
+            cursor: pointer;
         }
 
         footer {
@@ -599,29 +603,44 @@
         .page.active-page {
             display: block;
         }
-        .admin-btn{
-    background: linear-gradient(135deg,#e63946,#c1121f);
-    color:white;
-    border:none;
-    padding:10px 18px;
-    border-radius:30px;
-    font-size:0.9rem;
-    font-weight:600;
-    cursor:pointer;
-    box-shadow:0 4px 10px rgba(0,0,0,0.15);
-    display:block;
-    margin:15px auto;
-    transition:0.3s;
-}
+        
+        .admin-btn {
+            background: linear-gradient(135deg,#e63946,#c1121f);
+            color:white;
+            border:none;
+            padding:10px 18px;
+            border-radius:30px;
+            font-size:0.9rem;
+            font-weight:600;
+            cursor:pointer;
+            box-shadow:0 4px 10px rgba(0,0,0,0.15);
+            display:block;
+            margin:15px auto;
+            transition:0.3s;
+        }
 
-.admin-btn i{
-    margin-left:5px;
-}
+        .admin-btn i {
+            margin-left:5px;
+        }
 
-.admin-btn:hover{
-    transform:scale(1.05);
-    box-shadow:0 6px 15px rgba(0,0,0,0.2);
-}
+        .admin-btn:hover {
+            transform:scale(1.05);
+            box-shadow:0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -632,8 +651,8 @@
                 <!-- قسم اللوغو والنص معاً -->
                 <div class="logo-section">
                    <div class="logo-icon" onclick="secretAdmin()">
-    <img src="photo_5866022816728157838_x.jpg" alt="شعار الهلال الأحمر الجزائري">
-</div>
+                        <img src="photo_5866022816728157838_x.jpg" alt="شعار الهلال الأحمر الجزائري">
+                    </div>
                     <div class="logo-text">
                         <h1>الهلال الأحمر الجزائري</h1>
                         <p>اللجنة المحلية بريزينة</p>
@@ -712,29 +731,27 @@
             </div>
         </div>
 
-
-<!-- قسم الأخبار للرئيس -->
-
         <!-- صفحة الأخبار -->
         <div id="news-page" class="page">
             <div class="news-card">
                 <div class="news-header">
                     <h2><i class="fas fa-newspaper"></i> أنشطتنا</h2>
                     <button class="btn btn-primary" onclick="showPage('home')">
-                        <i class="fas fa-home"></i>
+                        <i class="fas fa-home"></i> الرئيسية
                     </button>
                 </div>
                 
-                <div class="icons-grid">
-                    <div class="icon-card" onclick="showKhitanDetails()">
+                <div class="icons-grid" id="news-grid">
+                    <!-- الأخبار الثابتة -->
+                    <div class="icon-card" onclick="showKhitanDetails()" data-news="khitan">
                         <img src="photo_5870672372229147944_x.jpg" alt="ختان جماعي الدفعة الأولى">
                         <div class="icon-card-content">
                             <i class="fas fa-cut"></i>
-                            <h3>ختان جماعي الدفعة الأولي</h3>
+                            <h3>ختان جماعي الدفعة الأولى</h3>
                         </div>
                     </div>
                     
-                    <div class="icon-card" onclick="showIftarDetails()">
+                    <div class="icon-card" onclick="showIftarDetails()" data-news="iftar">
                         <img src="photo_5870672372229147945_x.jpg" alt="إفطار صائم">
                         <div class="icon-card-content">
                             <i class="fas fa-utensils"></i>
@@ -744,8 +761,8 @@
                 </div>
             </div>
         </div>
-        
-        <!-- صفحات التفاصيل -->
+
+        <!-- صفحة تفاصيل ختان جماعي -->
         <div id="khitan-details-page" class="page">
             <div class="details-card">
                 <div class="details-header">
@@ -769,6 +786,7 @@
             </div>
         </div>
 
+        <!-- صفحة تفاصيل إفطار صائم -->
         <div id="iftar-details-page" class="page">
             <div class="details-card">
                 <div class="details-header">
@@ -792,75 +810,47 @@
             </div>
         </div>
 
-        <!-- نافذة الصور المكبرة -->
-        <div id="imageModal" onclick="closeModal()">
+        <!-- صفحة تفاصيل الأخبار الديناميكية -->
+        <div id="news-details-page" class="page">
+            <div class="details-card">
+                <div class="details-header">
+                    <div class="details-title">
+                        <i class="fas fa-newspaper"></i>
+                        <h2 id="dynamic-news-title">عنوان الخبر</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="showPage('news')">
+                        <i class="fas fa-arrow-right"></i> عودة
+                    </button>
+                </div>
+
+                <p id="dynamic-news-description" style="margin:15px 0;">وصف الخبر</p>
+
+                <div class="gallery-grid" id="dynamic-news-gallery"></div>
+            </div>
+        </div>
+
+        <!-- نافذة الصور المكبرة - واحدة فقط -->
+        <div id="imageModal" onclick="closeModal(event)">
             <img id="modalImage" src="">
             <button class="close-modal" onclick="closeModal(event)">✕</button>
         </div>
 
-     <!-- قسم الأخبار للرئيس - إضافة فورم الخبر -->
-<!-- قسم الأخبار للرئيس - إضافة فورم الخبر -->
-<!-- قسم الأخبار للرئيس - إضافة فورم الخبر -->
-<!-- =========================================== -->
-<!-- صفحة الأخبار + إضافة الأخبار + حذف + رفع الصور -->
-<!-- =========================================== -->
-<div id="admin-section" style="display:none;">
-  <h2 style="text-align:center; color:#e63946; margin-bottom:20px;">إضافة خبر جديد</h2>
-  <form id="newsForm" style="max-width:600px; margin:0 auto; background:#fff; padding:20px; border-radius:25px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    
-    <input type="text" name="title" placeholder="عنوان الخبر" required style="width:100%; padding:12px 15px; margin-bottom:15px; border-radius:12px; border:1px solid #e9ecef; font-size:1rem;">
-    
-    <textarea name="description" placeholder="وصف الخبر" required style="width:100%; padding:12px 15px; margin-bottom:15px; border-radius:12px; border:1px solid #e9ecef; font-size:1rem; resize:vertical;"></textarea>
-    
-    <input type="file" id="imageFiles" name="images" multiple accept="image/*" style="margin-bottom:15px;">
-    
-    <button type="submit" style="width:100%; padding:14px; background:linear-gradient(135deg,#e63946,#c1121f); color:white; border:none; border-radius:50px; font-size:1.1rem; font-weight:700; cursor:pointer; transition:0.3s;">
-      أضف الخبر
-    </button>
-  </form>
-</div>
-
-<!-- شبكة الأخبار -->
-<div id="news-page" class="page">
-  <div class="news-card">
-    <div class="news-header">
-      <h2><i class="fas fa-newspaper"></i> أنشطتنا</h2>
-      <button class="btn btn-primary" onclick="showPage('home')">
-        <i class="fas fa-home"></i>
-      </button>
-    </div>
-    <div class="icons-grid"></div>
-  </div>
-</div>
-
-<!-- نافذة الصور المكبرة -->
-<div id="imageModal" onclick="closeModal()">
-  <img id="modalImage" src="">
-  <button class="close-modal" onclick="closeModal(event)">✕</button>
-</div>
-
-
-
-<!-- صفحة الأخبار -->
-<div id="news-page" class="page">
-  <div class="news-card">
-      <div class="news-header">
-          <h2><i class="fas fa-newspaper"></i> أنشطتنا</h2>
-          <button class="btn btn-primary" onclick="showPage('home')">
-              <i class="fas fa-home"></i>
-          </button>
-      </div>
-      
-      <div class="icons-grid">
-          <!-- الأخبار ستضاف هنا ديناميكياً -->
-      </div>
-  </div>
-</div>
-
-
-
-
-
+        <!-- قسم إضافة الأخبار (لوحة التحكم) - يظهر فقط للرئيس -->
+        <div id="admin-section" style="display:none;">
+            <h2 style="text-align:center; color:#e63946; margin-bottom:20px;">إضافة خبر جديد</h2>
+            <form id="newsForm" style="max-width:600px; margin:0 auto; background:#fff; padding:20px; border-radius:25px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                
+                <input type="text" name="title" placeholder="عنوان الخبر" required style="width:100%; padding:12px 15px; margin-bottom:15px; border-radius:12px; border:1px solid #e9ecef; font-size:1rem;">
+                
+                <textarea name="description" placeholder="وصف الخبر" required style="width:100%; padding:12px 15px; margin-bottom:15px; border-radius:12px; border:1px solid #e9ecef; font-size:1rem; resize:vertical;"></textarea>
+                
+                <input type="file" id="imageFiles" name="images" multiple accept="image/*" style="margin-bottom:15px;">
+                
+                <button type="submit" style="width:100%; padding:14px; background:linear-gradient(135deg,#e63946,#c1121f); color:white; border:none; border-radius:50px; font-size:1.1rem; font-weight:700; cursor:pointer; transition:0.3s;">
+                    <i class="fas fa-plus"></i> أضف الخبر
+                </button>
+            </form>
+        </div>
 
         <!-- صفحة التسجيل -->
         <div id="registration-page" class="page">
@@ -964,7 +954,14 @@
                 </form>
             </div>
         </div>
-
+<!-- مودال تأكيد الإرسال -->
+<div id="confirmationModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:white; padding:30px; border-radius:15px; max-width:400px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+        <h3>✅ تم إرسال طلبك بنجاح!</h3>
+        <p>شكراً لتسجيلك معنا.</p>
+        <button onclick="closeConfirmationModal()" style="padding:10px 20px; border:none; border-radius:10px; background:#e63946; color:white; cursor:pointer; font-weight:600;">حسناً</button>
+    </div>
+</div>
         <!-- صفحة التأكيد -->
         <div id="confirmation-page" class="page confirmation-section">
             <div class="confirmation-card">
@@ -986,237 +983,348 @@
             <p>© 2026 الهلال الأحمر الجزائري - اللجنة المحلية بريزينة</p>
         </div>
     </footer>
-   
 
-   <script>
-/* ===========================
-   وظائف التنقل بين الصفحات
-=========================== */
-function showPage(pageName) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-    document.getElementById(pageName + '-page').classList.add('active-page');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    <script>
+        // متغيرات عامة
+        let clickCount = 0;
+        const adminPassword = "20040331";
+        let isAdmin = false;
 
-function showRegistration() { showPage('registration'); }
-function showHomePage() { showPage('home'); }
-
-/* ===========================
-   عرض الصور المكبرة
-=========================== */
-function openImage(src) {
-    const modal = document.getElementById('imageModal');
-    if(!modal){
-        const newModal = document.createElement('div');
-        newModal.id = 'imageModal';
-        newModal.style = "display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); justify-content:center; align-items:center; z-index:1000;";
-        
-        const img = document.createElement('img');
-        img.id = 'modalImage';
-        img.style = "max-width:90%; max-height:70%; border-radius:10px;";
-        newModal.appendChild(img);
-        
-        const btn = document.createElement('button');
-        btn.textContent = "✕";
-        btn.style = "position:absolute; top:15px; left:15px; background:white; border:none; width:40px; height:40px; border-radius:50%; font-size:1.3rem; cursor:pointer;";
-        btn.onclick = (e) => { e.stopPropagation(); newModal.style.display='none'; };
-        newModal.appendChild(btn);
-
-        newModal.onclick = () => { newModal.style.display='none'; };
-        document.body.appendChild(newModal);
-    }
-    document.getElementById('modalImage').src = src;
-    document.getElementById('imageModal').style.display = 'flex';
-}
-
-/* ===========================
-   استمارة التسجيل
-=========================== */
-document.getElementById('registrationForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const phone = document.querySelector('input[name="phone"]').value;
-    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
-    if (!phoneRegex.test(phone)) {
-        alert('رقم الهاتف غير صحيح. يجب أن يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام.');
-        return;
-    }
-
-    const experienceSelected = document.querySelector('input[name="volunteerExperience"]:checked');
-    if (!experienceSelected) {
-        alert('الرجاء اختيار هل لديك خبرة سابقة في التطوع أم لا');
-        return;
-    }
-
-    const data = {
-        name: document.querySelector('input[name="fullname"]').value,
-        birth: document.querySelector('input[name="birthdate"]').value,
-        phone: phone,
-        wilaya: document.querySelector('select[name="wilaya"]').value,
-        email: document.querySelector('input[name="email"]').value,
-        level: document.querySelector('select[name="education"]').value,
-        experience: experienceSelected.value,
-        field: document.querySelector('select[name="fields"]').value
-    };
-
-    fetch("https://script.google.com/macros/s/AKfycbz781C6YPvK4og3vaginNWdNjKEKSLUtkWnfD0xIIU_n1QexfETNDCu8WK5IDKNUjdP5Q/exec", {
-        method: "POST",
-        body: JSON.stringify(data)
-    })
-    .then(res => {
-        document.getElementById("registration-page").style.display = "none";
-        document.getElementById("confirmation-page").style.display = "block";
-        document.getElementById("registrationForm").reset();
-    })
-    .catch(err => {
-        alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
-        console.error(err);
-    });
-});
-
-/* ===========================
-   دخول الرئيس و أزرار الحذف
-=========================== */
-let clickCount = 0;
-const adminPassword = "20040331";
-let isAdmin = false;
-
-function secretAdmin() {
-    clickCount++;
-    if(clickCount === 3) {
-        const password = prompt(" رئيس اللجنة زكرياء صعدلي يرجى ادخال الكلمة السر");
-        if(password === adminPassword) {
-            document.getElementById("admin-section").style.display = "block";
-            isAdmin = true;
-            showAdminButtons();
-            alert("مرحباً بك رئيس اللجنة");
-        } else {
-            alert("كلمة السر غير صحيحة");
+        /* ===========================
+           وظائف التنقل بين الصفحات
+        =========================== */
+        function showPage(pageName) {
+            // إخفاء كل الصفحات
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            
+            // إظهار الصفحة المطلوبة
+            const page = document.getElementById(pageName + '-page');
+            if (page) {
+                page.classList.add('active-page');
+            }
+            
+            // تحديث النشاط في شريط التنقل
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const navItem = document.getElementById('nav-' + pageName);
+            if (navItem) navItem.classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        clickCount = 0;
-    }
-    setTimeout(() => { clickCount = 0; }, 2000);
-}
 
-function showAdminButtons() {
-    document.querySelectorAll('.admin-only').forEach(btn => btn.style.display = 'block');
-}
+        function showRegistration() { showPage('registration'); }
+        function showHomePage() { showPage('home'); }
 
-/* ===========================
-   إضافة خبر جديد (رفع صور مباشرة)
-=========================== */
-document.getElementById('newsForm').addEventListener('submit', function(e){
+        /* ===========================
+           عرض الصور المكبرة - تم إصلاح مشكلة الخروج
+        =========================== */
+        function openImage(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            if (modal && modalImg) {
+                modalImg.src = src;
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeModal(event) {
+            const modal = document.getElementById('imageModal');
+            
+            // منع إغلاق المودال إذا تم الضغط على الصورة نفسها
+            if (event && event.target === document.getElementById('modalImage')) {
+                return;
+            }
+            
+            if (modal) {
+                modal.style.display = 'none';
+                document.getElementById('modalImage').src = '';
+            }
+        }
+
+        // إغلاق المودال عند الضغط على زر ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('imageModal');
+                if (modal && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+            }
+        });
+
+        /* ===========================
+           استمارة التسجيل
+        =========================== */
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const phone = document.querySelector('input[name="phone"]').value;
+            const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('رقم الهاتف غير صحيح. يجب أن يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام.');
+                return;
+            }
+
+            const experienceSelected = document.querySelector('input[name="volunteerExperience"]:checked');
+            if (!experienceSelected) {
+                alert('الرجاء اختيار هل لديك خبرة سابقة في التطوع أم لا');
+                return;
+            }
+
+            const data = {
+                name: document.querySelector('input[name="fullname"]').value,
+                birth: document.querySelector('input[name="birthdate"]').value,
+                phone: phone,
+                wilaya: document.querySelector('select[name="wilaya"]').value,
+                email: document.querySelector('input[name="email"]').value,
+                level: document.querySelector('select[name="education"]').value,
+                experience: experienceSelected.value,
+                field: document.querySelector('select[name="fields"]').value
+            };
+
+            fetch("https://script.google.com/macros/s/AKfycbz781C6YPvK4og3vaginNWdNjKEKSLUtkWnfD0xIIU_n1QexfETNDCu8WK5IDKNUjdP5Q/exec", {
+                method: "POST",
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+    // عرض مربع تأكيد
+    openConfirmationModal();
+
+    // إعادة تعيين النموذج
+    document.getElementById("registrationForm").reset();
+})
+            .catch(err => {
+                alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
+                console.error(err);
+            });
+        });
+
+        /* ===========================
+           دخول الرئيس
+        =========================== */
+        function secretAdmin() {
+            clickCount++;
+            if(clickCount === 3) {
+                const password = prompt("رئيس اللجنة زكرياء صعدلي يرجى ادخال الكلمة السرية");
+                if(password === adminPassword) {
+                    document.getElementById("admin-section").style.display = "block";
+                    isAdmin = true;
+                    alert("مرحباً بك رئيس اللجنة");
+                } else {
+                    alert("كلمة السر غير صحيحة");
+                }
+                clickCount = 0;
+            }
+            setTimeout(() => { clickCount = 0; }, 2000);
+        }
+
+        /* ===========================
+           إضافة خبر جديد - الآن يتم الحفظ بشكل صحيح
+        =========================== */
+      const newsUrl = "https://script.google.com/macros/s/AKfycbwYZY9n60Ba9Jw48icf50kkphmY-RCFCuYj1fXdWmUOJXldq2bJDmUOu-OW_mYAIISquw/exec";
+
+document.getElementById('newsForm').addEventListener('submit', async function(e){
     e.preventDefault();
 
     const title = this.title.value;
     const description = this.description.value;
     const files = Array.from(document.getElementById('imageFiles').files);
 
-    if(files.length === 0){
-        alert("يرجى اختيار صورة واحدة على الأقل.");
-        return;
+    const images = files.map(file => URL.createObjectURL(file));
+
+    try{
+        await fetch(newsUrl,{
+            method:"POST",
+            body:JSON.stringify({
+                title:title,
+                description:description,
+                images:images
+            })
+        });
+
+        alert("✅ تم إضافة الخبر بنجاح");
+        this.reset();
+        loadNews();
+
+    }catch(err){
+        alert("❌ حدث خطأ أثناء إضافة الخبر");
+        console.error(err);
     }
-
-    const newsGrid = document.querySelector('#news-page .icons-grid');
-
-    const card = document.createElement('div');
-    card.classList.add('icon-card');
-    card.style.position = "relative";
-
-    // زر الحذف (خاص بالرئيس)
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = "✕";
-    deleteBtn.classList.add('delete-btn', 'admin-only');
-    deleteBtn.style = "position:absolute; top:5px; right:5px; background:#e63946; color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;";
-    deleteBtn.onclick = (ev) => {
-        ev.stopPropagation();
-        if(confirm("هل تريد حذف هذا الخبر؟")) {
-            card.remove();
-        }
-    };
-    if(isAdmin) deleteBtn.style.display = 'block';
-    card.appendChild(deleteBtn);
-
-    // عرض أول صورة كمعاينة
-    const imgTag = document.createElement('img');
-    imgTag.src = URL.createObjectURL(files[0]);
-    imgTag.alt = title;
-    imgTag.onclick = () => showNewsDetails(title, description, files);
-    card.appendChild(imgTag);
-
-    const content = document.createElement('div');
-    content.classList.add('icon-card-content');
-    content.innerHTML = `<i class="fas fa-newspaper"></i><h3>${title}</h3>`;
-    card.appendChild(content);
-
-    newsGrid.prepend(card);
-    this.reset();
 });
+            // حفظ بيانات الخبر في متغير مؤقت
+            const newsData = {
+                title: title,
+                description: description,
+                files: files,
+                imageUrls: files.map(file => URL.createObjectURL(file))
+            };
 
-/* ===========================
-   عرض تفاصيل الخبر مع كل الصور
-=========================== */
-function showNewsDetails(title, description, files){
-    let detailsPage = document.getElementById('news-details-page');
-    if(!detailsPage){
-        detailsPage = document.createElement('div');
-        detailsPage.id = 'news-details-page';
-        detailsPage.classList.add('page');
-        detailsPage.innerHTML = `
-        <div class="details-card">
-            <div class="details-header">
-                <div class="details-title"><i class="fas fa-newspaper"></i><h2>${title}</h2></div>
-                <button class="btn btn-primary" onclick="showPage('news')"><i class="fas fa-arrow-right"></i> عودة</button>
-            </div>
-            <p style="margin:15px 0;">${description}</p>
-            <div class="gallery-grid" id="news-gallery"></div>
-        </div>`;
-        document.querySelector('main.container').appendChild(detailsPage);
-    } else {
-        detailsPage.querySelector('.details-title h2').textContent = title;
-        detailsPage.querySelector('p').textContent = description;
-    }
+            // إنشاء بطاقة الخبر الجديدة
+            const newsGrid = document.getElementById('news-grid');
 
-    showPage('news-details');
+            const card = document.createElement('div');
+            card.classList.add('icon-card');
+            card.setAttribute('data-news-title', title);
+            card.setAttribute('data-news-description', description);
 
-    const gallery = document.getElementById('news-gallery');
-    gallery.innerHTML = '';
-    files.forEach(file => {
-        const img = document.createElement('img');
-        img.src = typeof file === "string" ? file : URL.createObjectURL(file);
-        img.onclick = () => openImage(img.src);
-        gallery.appendChild(img);
+            // حفظ بيانات الصور في الكارد
+            card.newsFiles = files;
+
+            // إضافة زر الحذف للرئيس فقط
+            if(isAdmin) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = "✕";
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.onclick = (ev) => {
+                    ev.stopPropagation();
+                    if(confirm("هل تريد حذف هذا الخبر؟")) {
+                        card.remove();
+                    }
+                };
+                card.appendChild(deleteBtn);
+            }
+
+            // عرض أول صورة كمعاينة
+            const imgTag = document.createElement('img');
+            imgTag.src = URL.createObjectURL(files[0]);
+            imgTag.alt = title;
+            
+            // ربط حدث النقر لعرض التفاصيل
+            imgTag.onclick = (e) => {
+                e.stopPropagation();
+                showNewsDetails(title, description, files);
+            };
+            
+            card.appendChild(imgTag);
+
+            const content = document.createElement('div');
+            content.classList.add('icon-card-content');
+            content.innerHTML = `<i class="fas fa-newspaper"></i><h3>${title}</h3>`;
+            
+            // ربط حدث النقر على المحتوى أيضاً
+            content.onclick = (e) => {
+                e.stopPropagation();
+                showNewsDetails(title, description, files);
+            };
+            
+            card.appendChild(content);
+
+            // إضافة البطاقة في بداية الشبكة
+            newsGrid.prepend(card);
+            
+            // إعادة تعيين النموذج
+            this.reset();
+            
+            alert("تم إضافة الخبر بنجاح!");
+    
+
+        /* ===========================
+           عرض تفاصيل الخبر الديناميكي
+        =========================== */
+        function showNewsDetails(title, description, files) {
+            // تحديث عنوان ووصف الخبر
+            document.getElementById('dynamic-news-title').textContent = title;
+            document.getElementById('dynamic-news-description').textContent = description;
+            
+            // تحديث معرض الصور
+            const gallery = document.getElementById('dynamic-news-gallery');
+            gallery.innerHTML = '';
+
+            files.forEach(file => {
+                const img = document.createElement('img');
+                
+                // إذا كان الملف عبارة عن كائن File (من الإضافة الجديدة)
+                if (file instanceof File) {
+                    img.src = URL.createObjectURL(file);
+                } else {
+                    // إذا كان الملف عبارة عن مسار (من الأخبار الثابتة)
+                    img.src = file;
+                }
+                
+                img.onclick = () => openImage(img.src);
+                gallery.appendChild(img);
+            });
+
+            // الانتقال لصفحة التفاصيل
+            showPage('news-details');
+        }
+
+        /* ===========================
+           دوال عرض الأخبار الثابتة
+        =========================== */
+        function showKhitanDetails() {
+            const title = "ختان جماعي";
+            const description = "تفاصيل عن ختان جماعي الدفعة الأولى...";
+            const files = [
+                "photo_5870672372229147940_y.jpg",
+                "photo_5870672372229147952_y.jpg",
+                "photo_5870672372229147954_y.jpg",
+                "photo_5870672372229147953_x.jpg",
+                "photo_5870672372229147941_x.jpg",
+                "photo_5870672372229147943_x.jpg"
+            ];
+            showNewsDetails(title, description, files);
+        }
+
+        function showIftarDetails() {
+            const title = "إفطار صائم";
+            const description = "تفاصيل عن إفطار صائم للجمعية...";
+            const files = [
+                "photo_5870672372229147947_x.jpg",
+                "photo_5870672372229147946_x.jpg",
+                "photo_5870672372229147948_x.jpg",
+                "photo_5870672372229147949_x.jpg",
+                "photo_5870672372229147951_x.jpg",
+                "photo_5870672372229147950_x.jpg"
+            ];
+            showNewsDetails(title, description, files);
+        }
+        function openConfirmationModal() {
+    const modal = document.getElementById('confirmationModal');
+    if(modal) modal.style.display = 'flex';
+}
+
+function closeConfirmationModal() {
+    const modal = document.getElementById('confirmationModal');
+    if(modal) modal.style.display = 'none';
+}
+async function loadNews(){
+
+    const newsGrid = document.getElementById("news-grid");
+    newsGrid.innerHTML = "";
+
+    const res = await fetch("https://script.google.com/macros/s/AKfycbwYZY9n60Ba9Jw48icf50kkphmY-RCFCuYj1fXdWmUOJXldq2bJDmUOu-OW_mYAIISquw/exec");
+
+    const news = await res.json();
+
+    news.reverse().forEach(n => {
+
+        const card = document.createElement("div");
+        card.classList.add("icon-card");
+
+        const img = document.createElement("img");
+        img.src = n.images[0] || "";
+        img.onclick = () => showNewsDetails(n.title,n.description,n.images);
+
+        const content = document.createElement("div");
+        content.classList.add("icon-card-content");
+        content.innerHTML = `<i class="fas fa-newspaper"></i><h3>${n.title}</h3>`;
+        content.onclick = () => showNewsDetails(n.title,n.description,n.images);
+
+        card.appendChild(img);
+        card.appendChild(content);
+
+        newsGrid.appendChild(card);
+
     });
-}
-function showKhitanDetails() {
-    const title = "ختان جماعي";
-    const description = "تفاصيل عن ختان جماعي الدفعة الأولى...";
-    const files = [
-        "photo_5870672372229147940_y.jpg",
-        "photo_5870672372229147952_y.jpg",
-        "photo_5870672372229147954_y.jpg",
-        "photo_5870672372229147953_x.jpg",
-        "photo_5870672372229147941_x.jpg",
-        "photo_5870672372229147943_x.jpg",
-    ];
-    showNewsDetails(title, description, files);
+
 }
 
-function showIftarDetails() {
-    const title = "إفطار صائم";
-    const description = "تفاصيل عن إفطار صائم للجمعية...";
-    const files = [
-        "photo_5870672372229147947_x.jpg",
-        "photo_5870672372229147946_x.jpg",
-        "photo_5870672372229147948_x.jpg",
-        "photo_5870672372229147949_x.jpg",
-        "photo_5870672372229147951_x.jpg",
-        "photo_5870672372229147950_x.jpg",
+window.onload = () => {
+    loadNews();
 
-    ];
-    showNewsDetails(title, description, files);
-}
-</script>
+    // تحديث الأخبار تلقائياً كل 10 ثواني
+    setInterval(loadNews, 10000);
+};
+    </script>
 </body>
-
 </html>
