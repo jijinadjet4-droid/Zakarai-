@@ -984,347 +984,264 @@
         </div>
     </footer>
 
-    <script>
-        // متغيرات عامة
-        let clickCount = 0;
-        const adminPassword = "20040331";
-        let isAdmin = false;
+  <script>
+    // ===========================
+    // متغيرات عامة
+    // ===========================
+    let clickCount = 0;
+    const adminPassword = "20040331";
+    let isAdmin = false;
+    const newsUrl = "https://script.google.com/macros/s/AKfycbwYZY9n60Ba9Jw48icf50kkphmY-RCFCuYj1fXdWmUOJXldq2bJDmUOu-OW_mYAIISquw/exec";
 
-        /* ===========================
-           وظائف التنقل بين الصفحات
-        =========================== */
-        function showPage(pageName) {
-            // إخفاء كل الصفحات
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            
-            // إظهار الصفحة المطلوبة
-            const page = document.getElementById(pageName + '-page');
-            if (page) {
-                page.classList.add('active-page');
-            }
-            
-            // تحديث النشاط في شريط التنقل
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            const navItem = document.getElementById('nav-' + pageName);
-            if (navItem) navItem.classList.add('active');
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    // ===========================
+    // وظائف التنقل بين الصفحات
+    // ===========================
+    function showPage(pageName) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        const page = document.getElementById(pageName + '-page');
+        if (page) page.classList.add('active-page');
 
-        function showRegistration() { showPage('registration'); }
-        function showHomePage() { showPage('home'); }
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const navItem = document.getElementById('nav-' + pageName);
+        if (navItem) navItem.classList.add('active');
 
-        /* ===========================
-           عرض الصور المكبرة - تم إصلاح مشكلة الخروج
-        =========================== */
-        function openImage(src) {
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            
-            if (modal && modalImg) {
-                modalImg.src = src;
-                modal.style.display = 'flex';
-            }
-        }
-
-        function closeModal(event) {
-            const modal = document.getElementById('imageModal');
-            
-            // منع إغلاق المودال إذا تم الضغط على الصورة نفسها
-            if (event && event.target === document.getElementById('modalImage')) {
-                return;
-            }
-            
-            if (modal) {
-                modal.style.display = 'none';
-                document.getElementById('modalImage').src = '';
-            }
-        }
-
-        // إغلاق المودال عند الضغط على زر ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const modal = document.getElementById('imageModal');
-                if (modal && modal.style.display === 'flex') {
-                    modal.style.display = 'none';
-                }
-            }
-        });
-
-        /* ===========================
-           استمارة التسجيل
-        =========================== */
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const phone = document.querySelector('input[name="phone"]').value;
-            const phoneRegex = /^(05|06|07)[0-9]{8}$/;
-            if (!phoneRegex.test(phone)) {
-                alert('رقم الهاتف غير صحيح. يجب أن يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام.');
-                return;
-            }
-
-            const experienceSelected = document.querySelector('input[name="volunteerExperience"]:checked');
-            if (!experienceSelected) {
-                alert('الرجاء اختيار هل لديك خبرة سابقة في التطوع أم لا');
-                return;
-            }
-
-            const data = {
-                name: document.querySelector('input[name="fullname"]').value,
-                birth: document.querySelector('input[name="birthdate"]').value,
-                phone: phone,
-                wilaya: document.querySelector('select[name="wilaya"]').value,
-                email: document.querySelector('input[name="email"]').value,
-                level: document.querySelector('select[name="education"]').value,
-                experience: experienceSelected.value,
-                field: document.querySelector('select[name="fields"]').value
-            };
-
-            fetch("https://script.google.com/macros/s/AKfycbz781C6YPvK4og3vaginNWdNjKEKSLUtkWnfD0xIIU_n1QexfETNDCu8WK5IDKNUjdP5Q/exec", {
-                method: "POST",
-                body: JSON.stringify(data)
-            })
-            .then(res => {
-    // عرض مربع تأكيد
-    openConfirmationModal();
-
-    // إعادة تعيين النموذج
-    document.getElementById("registrationForm").reset();
-})
-            .catch(err => {
-                alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
-                console.error(err);
-            });
-        });
-
-        /* ===========================
-           دخول الرئيس
-        =========================== */
-        function secretAdmin() {
-            clickCount++;
-            if(clickCount === 3) {
-                const password = prompt("رئيس اللجنة زكرياء صعدلي يرجى ادخال الكلمة السرية");
-                if(password === adminPassword) {
-                    document.getElementById("admin-section").style.display = "block";
-                    isAdmin = true;
-                    alert("مرحباً بك رئيس اللجنة");
-                } else {
-                    alert("كلمة السر غير صحيحة");
-                }
-                clickCount = 0;
-            }
-            setTimeout(() => { clickCount = 0; }, 2000);
-        }
-
-        /* ===========================
-           إضافة خبر جديد - الآن يتم الحفظ بشكل صحيح
-        =========================== */
-      const newsUrl = "https://script.google.com/macros/s/AKfycbwYZY9n60Ba9Jw48icf50kkphmY-RCFCuYj1fXdWmUOJXldq2bJDmUOu-OW_mYAIISquw/exec";
-
-document.getElementById('newsForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-
-    const title = this.title.value;
-    const description = this.description.value;
-    const files = Array.from(document.getElementById('imageFiles').files);
-
-    const images = files.map(file => URL.createObjectURL(file));
-
-    try{
-        await fetch(newsUrl,{
-            method:"POST",
-            body:JSON.stringify({
-                title:title,
-                description:description,
-                images:images
-            })
-        });
-
-        alert("✅ تم إضافة الخبر بنجاح");
-        this.reset();
-        loadNews();
-
-    }catch(err){
-        alert("❌ حدث خطأ أثناء إضافة الخبر");
-        console.error(err);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-});
-            // حفظ بيانات الخبر في متغير مؤقت
-            const newsData = {
-                title: title,
-                description: description,
-                files: files,
-                imageUrls: files.map(file => URL.createObjectURL(file))
-            };
 
-            // إنشاء بطاقة الخبر الجديدة
-            const newsGrid = document.getElementById('news-grid');
+    function showRegistration() { showPage('registration'); }
+    function showHomePage() { showPage('home'); }
 
-            const card = document.createElement('div');
-            card.classList.add('icon-card');
-            card.setAttribute('data-news-title', title);
-            card.setAttribute('data-news-description', description);
+    // ===========================
+    // عرض الصور المكبرة
+    // ===========================
+    function openImage(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        if (modal && modalImg) {
+            modalImg.src = src;
+            modal.style.display = 'flex';
+        }
+    }
 
-            // حفظ بيانات الصور في الكارد
-            card.newsFiles = files;
+    function closeModal(event) {
+        const modal = document.getElementById('imageModal');
+        if (event && event.target === document.getElementById('modalImage')) return;
+        if (modal) {
+            modal.style.display = 'none';
+            document.getElementById('modalImage').src = '';
+        }
+    }
 
-            // إضافة زر الحذف للرئيس فقط
-            if(isAdmin) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = "✕";
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.onclick = (ev) => {
-                    ev.stopPropagation();
-                    if(confirm("هل تريد حذف هذا الخبر؟")) {
-                        card.remove();
-                    }
-                };
-                card.appendChild(deleteBtn);
-            }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('imageModal');
+            if (modal && modal.style.display === 'flex') modal.style.display = 'none';
+        }
+    });
 
-            // عرض أول صورة كمعاينة
-            const imgTag = document.createElement('img');
-            imgTag.src = URL.createObjectURL(files[0]);
-            imgTag.alt = title;
-            
-            // ربط حدث النقر لعرض التفاصيل
-            imgTag.onclick = (e) => {
-                e.stopPropagation();
-                showNewsDetails(title, description, files);
-            };
-            
-            card.appendChild(imgTag);
+    // ===========================
+    // استمارة التسجيل
+    // ===========================
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            const content = document.createElement('div');
-            content.classList.add('icon-card-content');
-            content.innerHTML = `<i class="fas fa-newspaper"></i><h3>${title}</h3>`;
-            
-            // ربط حدث النقر على المحتوى أيضاً
-            content.onclick = (e) => {
-                e.stopPropagation();
-                showNewsDetails(title, description, files);
-            };
-            
-            card.appendChild(content);
-
-            // إضافة البطاقة في بداية الشبكة
-            newsGrid.prepend(card);
-            
-            // إعادة تعيين النموذج
-            this.reset();
-            
-            alert("تم إضافة الخبر بنجاح!");
-    
-
-        /* ===========================
-           عرض تفاصيل الخبر الديناميكي
-        =========================== */
-        function showNewsDetails(title, description, files) {
-            // تحديث عنوان ووصف الخبر
-            document.getElementById('dynamic-news-title').textContent = title;
-            document.getElementById('dynamic-news-description').textContent = description;
-            
-            // تحديث معرض الصور
-            const gallery = document.getElementById('dynamic-news-gallery');
-            gallery.innerHTML = '';
-
-            files.forEach(file => {
-                const img = document.createElement('img');
-                
-                // إذا كان الملف عبارة عن كائن File (من الإضافة الجديدة)
-                if (file instanceof File) {
-                    img.src = URL.createObjectURL(file);
-                } else {
-                    // إذا كان الملف عبارة عن مسار (من الأخبار الثابتة)
-                    img.src = file;
-                }
-                
-                img.onclick = () => openImage(img.src);
-                gallery.appendChild(img);
-            });
-
-            // الانتقال لصفحة التفاصيل
-            showPage('news-details');
+        const phone = this.phone.value;
+        const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+        if (!phoneRegex.test(phone)) {
+            alert('رقم الهاتف غير صحيح. يجب أن يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام.');
+            return;
         }
 
-        /* ===========================
-           دوال عرض الأخبار الثابتة
-        =========================== */
-        function showKhitanDetails() {
-            const title = "ختان جماعي";
-            const description = "تفاصيل عن ختان جماعي الدفعة الأولى...";
-            const files = [
+        const experienceSelected = document.querySelector('input[name="volunteerExperience"]:checked');
+        if (!experienceSelected) {
+            alert('الرجاء اختيار هل لديك خبرة سابقة في التطوع أم لا');
+            return;
+        }
+
+        const data = {
+            name: this.fullname.value,
+            birth: this.birthdate.value,
+            phone: phone,
+            wilaya: this.wilaya.value,
+            email: this.email.value,
+            level: this.education.value,
+            experience: experienceSelected.value,
+            field: this.fields.value
+        };
+
+        fetch("https://script.google.com/macros/s/AKfycbz781C6YPvK4og3vaginNWdNjKEKSLUtkWnfD0xIIU_n1QexfETNDCu8WK5IDKNUjdP5Q/exec", {
+            method: "POST",
+            body: JSON.stringify(data)
+        })
+        .then(res => {
+            openConfirmationModal();
+            this.reset();
+        })
+        .catch(err => {
+            alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
+            console.error(err);
+        });
+    });
+
+    // ===========================
+    // دخول الرئيس
+    // ===========================
+    function secretAdmin() {
+        clickCount++;
+        if(clickCount === 3) {
+            const password = prompt("رئيس اللجنة زكرياء صعدلي يرجى ادخال الكلمة السرية");
+            if(password === adminPassword) {
+                document.getElementById("admin-section").style.display = "block";
+                isAdmin = true;
+                alert("مرحباً بك رئيس اللجنة");
+            } else {
+                alert("كلمة السر غير صحيحة");
+            }
+            clickCount = 0;
+        }
+        setTimeout(() => { clickCount = 0; }, 2000);
+    }
+
+    // ===========================
+    // إضافة خبر جديد
+    // ===========================
+    document.getElementById('newsForm').addEventListener('submit', async function(e){
+        e.preventDefault();
+
+        const title = this.title.value;
+        const description = this.description.value;
+        const files = Array.from(this.imageFiles.files);
+        const images = files.map(file => URL.createObjectURL(file));
+
+        try{
+            await fetch(newsUrl,{
+                method:"POST",
+                body:JSON.stringify({ title, description, images })
+            });
+
+            alert("✅ تم إضافة الخبر بنجاح");
+            this.reset();
+            loadNews(); // إعادة تحميل الأخبار تلقائياً
+
+        }catch(err){
+            alert("❌ حدث خطأ أثناء إضافة الخبر");
+            console.error(err);
+        }
+    });
+
+    // ===========================
+    // عرض تفاصيل الخبر
+    // ===========================
+    function showNewsDetails(title, description, files) {
+        document.getElementById('dynamic-news-title').textContent = title;
+        document.getElementById('dynamic-news-description').textContent = description;
+
+        const gallery = document.getElementById('dynamic-news-gallery');
+        gallery.innerHTML = '';
+
+        files.forEach(file => {
+            const img = document.createElement('img');
+            img.src = file instanceof File ? URL.createObjectURL(file) : file;
+            img.onclick = () => openImage(img.src);
+            gallery.appendChild(img);
+        });
+
+        showPage('news-details');
+    }
+
+    // ===========================
+    // عرض الأخبار الثابتة
+    // ===========================
+    function showKhitanDetails() {
+        showNewsDetails(
+            "ختان جماعي",
+            "تفاصيل عن ختان جماعي الدفعة الأولى...",
+            [
                 "photo_5870672372229147940_y.jpg",
                 "photo_5870672372229147952_y.jpg",
                 "photo_5870672372229147954_y.jpg",
                 "photo_5870672372229147953_x.jpg",
                 "photo_5870672372229147941_x.jpg",
                 "photo_5870672372229147943_x.jpg"
-            ];
-            showNewsDetails(title, description, files);
-        }
+            ]
+        );
+    }
 
-        function showIftarDetails() {
-            const title = "إفطار صائم";
-            const description = "تفاصيل عن إفطار صائم للجمعية...";
-            const files = [
+    function showIftarDetails() {
+        showNewsDetails(
+            "إفطار صائم",
+            "تفاصيل عن إفطار صائم للجمعية...",
+            [
                 "photo_5870672372229147947_x.jpg",
                 "photo_5870672372229147946_x.jpg",
                 "photo_5870672372229147948_x.jpg",
                 "photo_5870672372229147949_x.jpg",
                 "photo_5870672372229147951_x.jpg",
                 "photo_5870672372229147950_x.jpg"
-            ];
-            showNewsDetails(title, description, files);
+            ]
+        );
+    }
+
+    // ===========================
+    // مودال التأكيد
+    // ===========================
+    function openConfirmationModal() {
+        const modal = document.getElementById('confirmationModal');
+        if(modal) modal.style.display = 'flex';
+    }
+
+    function closeConfirmationModal() {
+        const modal = document.getElementById('confirmationModal');
+        if(modal) modal.style.display = 'none';
+    }
+
+    // ===========================
+    // تحميل الأخبار
+    // ===========================
+    async function loadNews() {
+        const newsGrid = document.getElementById("news-grid");
+        newsGrid.innerHTML = "";
+
+        try {
+            const res = await fetch(newsUrl);
+            const data = await res.json();
+
+            data.reverse().forEach(news => {
+                const card = document.createElement("div");
+                card.className = "icon-card";
+
+                const img = document.createElement("img");
+                img.src = news.images[0] || "";
+                img.alt = news.title;
+
+                const content = document.createElement("div");
+                content.className = "icon-card-content";
+                content.innerHTML = `<i class="fas fa-newspaper"></i><h3>${news.title}</h3>`;
+
+                const openDetails = () => showNewsDetails(news.title, news.description, news.images);
+                card.onclick = openDetails;
+                content.onclick = openDetails;
+                img.onclick = (e) => { e.stopPropagation(); openDetails(); };
+
+                card.appendChild(img);
+                card.appendChild(content);
+                newsGrid.prepend(card);
+            });
+
+        } catch (err) {
+            console.error("خطأ في تحميل الأخبار:", err);
+            alert("❌ فشل تحميل الأخبار. حاول مرة أخرى لاحقاً.");
         }
-        function openConfirmationModal() {
-    const modal = document.getElementById('confirmationModal');
-    if(modal) modal.style.display = 'flex';
-}
+    }
 
-function closeConfirmationModal() {
-    const modal = document.getElementById('confirmationModal');
-    if(modal) modal.style.display = 'none';
-}
-async function loadNews(){
-
-    const newsGrid = document.getElementById("news-grid");
-    newsGrid.innerHTML = "";
-
-    const res = await fetch("https://script.google.com/macros/s/AKfycbwYZY9n60Ba9Jw48icf50kkphmY-RCFCuYj1fXdWmUOJXldq2bJDmUOu-OW_mYAIISquw/exec");
-
-    const news = await res.json();
-
-    news.reverse().forEach(n => {
-
-        const card = document.createElement("div");
-        card.classList.add("icon-card");
-
-        const img = document.createElement("img");
-        img.src = n.images[0] || "";
-        img.onclick = () => showNewsDetails(n.title,n.description,n.images);
-
-        const content = document.createElement("div");
-        content.classList.add("icon-card-content");
-        content.innerHTML = `<i class="fas fa-newspaper"></i><h3>${n.title}</h3>`;
-        content.onclick = () => showNewsDetails(n.title,n.description,n.images);
-
-        card.appendChild(img);
-        card.appendChild(content);
-
-        newsGrid.appendChild(card);
-
-    });
-
-}
-
-window.onload = () => {
-    loadNews();
-
-    // تحديث الأخبار تلقائياً كل 10 ثواني
-    setInterval(loadNews, 10000);
-};
-    </script>
+    // ===========================
+    // تنفيذ عند تحميل الصفحة
+    // ===========================
+    window.onload = () => {
+        loadNews();
+        setInterval(loadNews, 10000); // تحديث الأخبار كل 10 ثواني
+    };
+</script>
 </body>
 </html>
+
